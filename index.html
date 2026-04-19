@@ -647,6 +647,7 @@ tr:hover td { background: var(--gray-50); }
       <div class="sidebar-item" onclick="adminSection('tickets',this)"><span class="icon">🎫</span> Tickets <span class="sidebar-badge" id="admin-ticket-badge">0</span></div>
       <div class="sidebar-section">System</div>
       <div class="sidebar-item" onclick="adminSection('tenants',this)"><span class="icon">👥</span> Tenants</div>
+      <div class="sidebar-item" onclick="openChangePassword('admin')"><span class="icon">🔒</span> Change Password</div>
       <div class="sidebar-item" onclick="adminLogout()"><span class="icon">🚪</span> Logout</div>
     </aside>
     <main class="main-content" id="admin-main"></main>
@@ -668,6 +669,7 @@ tr:hover td { background: var(--gray-50); }
       <div class="sidebar-item" onclick="tenantSection('my-tickets',this)"><span class="icon">🎫</span> My Tickets</div>
       <div class="sidebar-item" onclick="tenantSection('raise-ticket',this)"><span class="icon">📝</span> Raise Ticket</div>
       <div class="sidebar-section">Account</div>
+      <div class="sidebar-item" onclick="openChangePassword('tenant')"><span class="icon">🔒</span> Change Password</div>
       <div class="sidebar-item" onclick="tenantLogout()"><span class="icon">🚪</span> Logout</div>
     </aside>
     <main class="main-content" id="tenant-main"></main>
@@ -677,6 +679,46 @@ tr:hover td { background: var(--gray-50); }
 <!-- ══════════════════════════════════════════
      MODALS
 ══════════════════════════════════════════ -->
+<!-- Change Password Modal -->
+<div class="overlay" id="overlay-change-password">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>🔒 Change Password</h3>
+      <button class="modal-close" onclick="closeModal('overlay-change-password')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-400);margin-bottom:20px;" id="cp-context"></p>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label>Current Password *</label>
+        <div style="position:relative;">
+          <input type="password" id="cp-current" placeholder="Enter current password" style="width:100%;padding-right:40px;">
+          <button onclick="togglePw('cp-current')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);font-size:16px;cursor:pointer;" id="cp-current-eye">👁</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label>New Password *</label>
+        <div style="position:relative;">
+          <input type="password" id="cp-new" placeholder="At least 6 characters" style="width:100%;padding-right:40px;">
+          <button onclick="togglePw('cp-new')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);font-size:16px;cursor:pointer;">👁</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:8px;">
+        <label>Confirm New Password *</label>
+        <div style="position:relative;">
+          <input type="password" id="cp-confirm" placeholder="Repeat new password" style="width:100%;padding-right:40px;">
+          <button onclick="togglePw('cp-confirm')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);font-size:16px;cursor:pointer;">👁</button>
+        </div>
+      </div>
+      <div id="cp-strength" style="margin-top:10px;font-size:12px;"></div>
+      <div id="cp-error" style="margin-top:10px;font-size:13px;color:var(--danger);display:none;background:var(--danger-bg);padding:10px 12px;border-radius:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('overlay-change-password')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Property Modal -->
 <div class="overlay" id="overlay-edit-prop">
   <div class="modal">
@@ -913,7 +955,7 @@ function formatPrice(p) {
 function adminLogin() {
   const user = document.getElementById('admin-user').value;
   const pass = document.getElementById('admin-pass').value;
-  if (pass === 'admin123') {
+  if (pass === passwords['admin']) {
     state.currentUser = { name: 'Administrator' };
     state.userType = 'admin';
     showPage('admin');
@@ -1503,6 +1545,80 @@ function showToast(msg, type) {
 document.querySelectorAll('.overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
+
+/* ═══════════════════════════════
+   CHANGE PASSWORD
+═══════════════════════════════ */
+let _cpUserType = null;
+
+// Passwords stored in memory (in a real app these would be hashed server-side)
+let passwords = { admin: 'admin123', tenant: 'tenant123' };
+
+function openChangePassword(userType) {
+  _cpUserType = userType;
+  document.getElementById('cp-context').textContent =
+    userType === 'admin' ? '🔑 Changing password for: Administrator' :
+    '👤 Changing password for: ' + (state.currentUser ? state.currentUser.name : 'Tenant');
+  ['cp-current','cp-new','cp-confirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('cp-strength').innerHTML = '';
+  document.getElementById('overlay-change-password').classList.add('open');
+  document.getElementById('cp-new').addEventListener('input', checkStrength);
+}
+
+function togglePw(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function checkStrength() {
+  const val = document.getElementById('cp-new').value;
+  const el = document.getElementById('cp-strength');
+  if (!val) { el.innerHTML = ''; return; }
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { label: 'Very Weak', color: '#B82B2B' },
+    { label: 'Weak',      color: '#B82B2B' },
+    { label: 'Fair',      color: '#9A6500' },
+    { label: 'Good',      color: '#1A5FA8' },
+    { label: 'Strong',    color: '#1D7A4C' },
+    { label: 'Very Strong', color: '#1D7A4C' },
+  ];
+  const lvl = levels[Math.min(score, 5)];
+  const pct = Math.round((score / 5) * 100);
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;height:4px;background:var(--gray-100);border-radius:4px;">
+        <div style="width:${pct}%;height:100%;background:${lvl.color};border-radius:4px;transition:width .3s;"></div>
+      </div>
+      <span style="color:${lvl.color};font-weight:500;">${lvl.label}</span>
+    </div>`;
+}
+
+function savePassword() {
+  const current  = document.getElementById('cp-current').value;
+  const newPw    = document.getElementById('cp-new').value;
+  const confirm  = document.getElementById('cp-confirm').value;
+  const errEl    = document.getElementById('cp-error');
+  const showErr  = msg => { errEl.textContent = msg; errEl.style.display = 'block'; };
+
+  errEl.style.display = 'none';
+
+  if (!current || !newPw || !confirm) { showErr('Please fill in all fields.'); return; }
+  if (current !== passwords[_cpUserType]) { showErr('Current password is incorrect.'); return; }
+  if (newPw.length < 6) { showErr('New password must be at least 6 characters.'); return; }
+  if (newPw !== confirm) { showErr('New passwords do not match.'); return; }
+  if (newPw === current) { showErr('New password must be different from the current one.'); return; }
+
+  passwords[_cpUserType] = newPw;
+  closeModal('overlay-change-password');
+  showToast('Password updated successfully! 🔒', 'success');
+}
 
 /* ═══════════════════════════════
    ENQUIRY & INFO PACK
