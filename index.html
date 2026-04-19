@@ -643,6 +643,7 @@ tr:hover td { background: var(--gray-50); }
       <div class="sidebar-item" onclick="adminSection('add-property',this)"><span class="icon">➕</span> Add Property</div>
       <div class="sidebar-section">Support</div>
       <div class="sidebar-item" onclick="adminSection('tickets',this)"><span class="icon">🎫</span> Tickets <span class="sidebar-badge" id="admin-ticket-badge">0</span></div>
+      <div class="sidebar-item" onclick="adminSection('enquiries',this)"><span class="icon">📩</span> Enquiries <span class="sidebar-badge" id="admin-enquiry-badge" style="display:none;">0</span></div>
       <div class="sidebar-section">System</div>
       <div class="sidebar-item" onclick="adminSection('tenants',this)"><span class="icon">👥</span> Tenants</div>
       <div class="sidebar-item" onclick="adminSection('add-tenant',this)"><span class="icon">➕</span> Add Tenant</div>
@@ -841,6 +842,9 @@ let tickets = [];
 let nextTicketId = 1;
 let nextPropId = 7;
 
+let enquiries = [];
+let nextEnquiryId = 1;
+
 /* ═══════════════════════════════
    NAVIGATION
 ═══════════════════════════════ */
@@ -983,6 +987,7 @@ function adminSection(name, el) {
   else if (name === 'properties') renderAdminProperties();
   else if (name === 'add-property') renderAddProperty();
   else if (name === 'tickets') renderAdminTickets();
+  else if (name === 'enquiries') renderAdminEnquiries();
   else if (name === 'tenants') renderAdminTenants();
   else if (name === 'add-tenant') renderAddTenant();
 }
@@ -990,6 +995,10 @@ function adminSection(name, el) {
 function updateAdminBadge() {
   const open = tickets.filter(t => t.status === 'open' || t.status === 'inprogress').length;
   document.getElementById('admin-ticket-badge').textContent = open;
+  const newEnq = enquiries.filter(e => e.status === 'new').length;
+  const badge = document.getElementById('admin-enquiry-badge');
+  badge.textContent = newEnq;
+  badge.style.display = newEnq > 0 ? 'inline-block' : 'none';
 }
 
 function renderAdminDashboard() {
@@ -1001,9 +1010,10 @@ function renderAdminDashboard() {
       <h2>Dashboard</h2>
       <span style="font-size:13px;color:var(--gray-400);">Welcome back, Administrator</span>
     </div>
-    <div class="stats-row">
+    <div class="stats-row" style="grid-template-columns:repeat(5,1fr);">
       <div class="stat-card"><div class="label">Total Properties</div><div class="value">${properties.length}<span class="stat-icon">🏠</span></div></div>
       <div class="stat-card"><div class="label">Active Tenants</div><div class="value">${tenants.length}<span class="stat-icon">👥</span></div></div>
+      <div class="stat-card"><div class="label">New Enquiries</div><div class="value" style="color:var(--gold)">${enquiries.filter(e=>e.status==='new').length}<span class="stat-icon">📩</span></div></div>
       <div class="stat-card"><div class="label">Open Tickets</div><div class="value" style="color:var(--danger)">${openTix}<span class="stat-icon">🔴</span></div></div>
       <div class="stat-card"><div class="label">Resolved Tickets</div><div class="value" style="color:var(--success)">${resolved}<span class="stat-icon">✅</span></div></div>
     </div>
@@ -1767,11 +1777,30 @@ function openEnquiryModal(id) {
 }
 
 function submitEnquiry() {
-  const name = document.getElementById('enq-name').value.trim();
-  const email = document.getElementById('enq-email').value.trim();
+  const name    = document.getElementById('enq-name').value.trim();
+  const email   = document.getElementById('enq-email').value.trim();
+  const phone   = document.getElementById('enq-phone').value.trim();
+  const date    = document.getElementById('enq-date').value;
+  const message = document.getElementById('enq-message').value.trim();
   if (!name || !email) { showToast('Please enter your name and email', 'danger'); return; }
+  const p = properties.find(x => x.id === _enquiryPropId);
+  const now = new Date();
+  enquiries.push({
+    id: nextEnquiryId++,
+    type: 'viewing',
+    label: p && p.type === 'rent' ? 'Book Viewing' : 'Make Enquiry',
+    propertyId: _enquiryPropId,
+    propertyTitle: p ? p.title : '—',
+    name, email,
+    phone: phone || '—',
+    viewingDate: date || '—',
+    message: message || '—',
+    status: 'new',
+    received: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) + ', ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+  });
+  updateAdminBadge();
   closeModal('overlay-enquiry');
-  showToast('Enquiry sent! We\'ll be in touch within 24 hours.', 'success');
+  showToast('Enquiry submitted! We\'ll be in touch within 24 hours. ✅', 'success');
 }
 
 function openInfoPackModal(id) {
@@ -1783,11 +1812,114 @@ function openInfoPackModal(id) {
 }
 
 function submitInfoPack() {
-  const name = document.getElementById('ip-name').value.trim();
+  const name  = document.getElementById('ip-name').value.trim();
   const email = document.getElementById('ip-email').value.trim();
   if (!name || !email) { showToast('Please enter your name and email', 'danger'); return; }
+  const p = properties.find(x => x.id === _infoPackPropId);
+  const now = new Date();
+  enquiries.push({
+    id: nextEnquiryId++,
+    type: 'infopack',
+    label: 'Info Pack Request',
+    propertyId: _infoPackPropId,
+    propertyTitle: p ? p.title : '—',
+    name, email,
+    phone: '—',
+    viewingDate: '—',
+    message: '—',
+    status: 'new',
+    received: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) + ', ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+  });
+  updateAdminBadge();
   closeModal('overlay-infopack');
-  showToast('Info pack will be emailed to ' + email + ' shortly!', 'success');
+  showToast('Info pack requested! It will be sent to ' + email + ' shortly. ✅', 'success');
+}
+
+/* ═══════════════════════════════
+   ADMIN ENQUIRIES
+═══════════════════════════════ */
+function renderAdminEnquiries() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header">
+      <h2>Enquiries & Requests</h2>
+      <div style="display:flex;gap:8px;">
+        <span style="font-size:13px;color:var(--gray-400);align-self:center;">${enquiries.length} total</span>
+        ${enquiries.some(e=>e.status==='new') ? `<button class="btn btn-outline btn-sm" onclick="markAllEnquiriesRead()">Mark all as read</button>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      ${['all','new','viewed','actioned'].map(s => `<button class="filter-pill ${s==='all'?'active':''}" onclick="filterEnquiries('${s}',this)">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}
+      <button class="filter-pill" onclick="filterEnquiries('viewing',this)">Viewings</button>
+      <button class="filter-pill" onclick="filterEnquiries('infopack',this)">Info Packs</button>
+    </div>
+    ${enquiries.length === 0 ? `
+      <div class="card"><div class="empty"><div class="icon">📩</div><p>No enquiries yet. They will appear here when someone submits a viewing request or info pack request from the property listings.</p></div></div>
+    ` : `
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Name</th><th>Email</th><th>Phone</th><th>Property</th><th>Viewing Date</th><th>Message</th><th>Received</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="enquiry-table-body">${renderEnquiryRows(enquiries)}</tbody>
+        </table>
+      </div>
+    </div>`}
+  `;
+}
+
+function renderEnquiryRows(list) {
+  if (!list.length) return '<tr><td colspan="10" style="text-align:center;color:var(--gray-400);padding:32px;">No enquiries match this filter</td></tr>';
+  return list.map(e => `
+    <tr style="${e.status==='new' ? 'background:var(--gold-pale);' : ''}">
+      <td>
+        <span class="badge ${e.type==='viewing' ? 'badge-inprogress' : 'badge-open'}" style="white-space:nowrap;">${e.type==='viewing' ? '👁 '+e.label : '📄 '+e.label}</span>
+        ${e.status==='new' ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:middle;"></span>' : ''}
+      </td>
+      <td><strong>${e.name}</strong></td>
+      <td><a href="mailto:${e.email}" style="color:var(--info);">${e.email}</a></td>
+      <td style="color:var(--gray-600);font-size:13px;">${e.phone}</td>
+      <td style="font-size:13px;">${e.propertyTitle}</td>
+      <td style="font-size:13px;color:var(--gray-600);">${e.viewingDate !== '—' ? '📅 '+e.viewingDate : '—'}</td>
+      <td style="font-size:13px;color:var(--gray-600);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${e.message}">${e.message}</td>
+      <td style="font-size:12px;color:var(--gray-400);white-space:nowrap;">${e.received}</td>
+      <td>
+        <select onchange="updateEnquiryStatus(${e.id}, this.value)" style="border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--white);">
+          ${['new','viewed','actioned'].map(s => `<option value="${s}" ${e.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteEnquiry(${e.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterEnquiries(filter, btn) {
+  document.querySelectorAll('#admin-main .filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  let list = [...enquiries];
+  if (filter === 'viewing' || filter === 'infopack') list = list.filter(e => e.type === filter);
+  else if (filter !== 'all') list = list.filter(e => e.status === filter);
+  document.getElementById('enquiry-table-body').innerHTML = renderEnquiryRows(list);
+}
+
+function updateEnquiryStatus(id, status) {
+  const e = enquiries.find(x => x.id === id);
+  if (e) { e.status = status; updateAdminBadge(); }
+}
+
+function markAllEnquiriesRead() {
+  enquiries.forEach(e => { if (e.status === 'new') e.status = 'viewed'; });
+  updateAdminBadge();
+  renderAdminEnquiries();
+  showToast('All enquiries marked as viewed.', 'success');
+}
+
+function deleteEnquiry(id) {
+  if (!confirm('Delete this enquiry?')) return;
+  enquiries = enquiries.filter(x => x.id !== id);
+  updateAdminBadge();
+  renderAdminEnquiries();
+  showToast('Enquiry deleted.');
 }
 
 /* ═══════════════════════════════
