@@ -591,14 +591,13 @@ tr:hover td { background: var(--gray-50); }
       <div class="login-logo">Prop<span>Estate</span> Tenant</div>
       <h2>Tenant Portal</h2>
       <p>Access your property and manage support requests</p>
-      <div class="login-hint">Demo: select any tenant from the list below</div>
       <div class="form-group" style="margin-bottom:16px;">
         <label>Select Tenant Account</label>
         <select id="tenant-select"></select>
       </div>
       <div class="form-group" style="margin-bottom:24px;">
         <label>Password</label>
-        <input type="password" value="tenant123" placeholder="tenant123">
+        <input type="password" id="tenant-pass" placeholder="Enter password">
       </div>
       <button class="btn btn-primary" style="width:100%;" onclick="tenantLogin()">Sign In</button>
     </div>
@@ -614,14 +613,13 @@ tr:hover td { background: var(--gray-50); }
       <div class="login-logo">Prop<span>Estate</span> Admin</div>
       <h2>Admin Dashboard</h2>
       <p>Manage properties and resolve tenant issues</p>
-      <div class="login-hint">Demo password: <strong>admin123</strong></div>
       <div class="form-group" style="margin-bottom:16px;">
         <label>Username</label>
-        <input type="text" id="admin-user" value="admin" placeholder="admin">
+        <input type="text" id="admin-user" placeholder="Enter username">
       </div>
       <div class="form-group" style="margin-bottom:24px;">
         <label>Password</label>
-        <input type="password" id="admin-pass" value="admin123" placeholder="admin123">
+        <input type="password" id="admin-pass" placeholder="Enter password">
       </div>
       <button class="btn btn-primary" style="width:100%;" onclick="adminLogin()">Sign In</button>
     </div>
@@ -1313,6 +1311,9 @@ function populateTenantSelect() {
 
 function tenantLogin() {
   const id = parseInt(document.getElementById('tenant-select').value);
+  const pass = document.getElementById('tenant-pass').value;
+  if (!pass) { showToast('Please enter your password', 'danger'); return; }
+  if (pass !== passwords['tenant']) { showToast('Incorrect password', 'danger'); return; }
   const tenant = tenants.find(t => t.id === id);
   if (tenant) {
     state.currentUser = tenant;
