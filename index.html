@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropEstate — Property Management</title>
+<style>
+:root {
+  --navy: #0C1B33;
+  --navy-mid: #1A2F50;
+  --navy-light: #2A4A7F;
+  --gold: #C8922A;
+  --gold-light: #E8B84B;
+  --gold-pale: #FDF4E3;
+  --cream: #F9F6F0;
+  --white: #FFFFFF;
+  --gray-50: #F8F8F8;
+  --gray-100: #EEEEEE;
+  --gray-200: #DDDDDD;
+  --gray-400: #AAAAAA;
+  --gray-600: #666666;
+  --gray-800: #333333;
+  --success: #1D7A4C;
+  --success-bg: #E6F5EE;
+  --danger: #B82B2B;
+  --danger-bg: #FBE9E9;
+  --warning: #9A6500;
+  --warning-bg: #FEF3D9;
+  --info: #1A5FA8;
+  --info-bg: #E4EFFC;
+  --font: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 2px 12px rgba(12,27,51,0.08);
+  --shadow-hover: 0 6px 24px rgba(12,27,51,0.14);
+  --transition: 0.2s ease;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--cream); color: var(--gray-800); line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: var(--font); }
+input, select, textarea { font-family: var(--font); }
+
+/* ── NAV ── */
+nav {
+  background: var(--navy);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+.nav-logo span { color: var(--gold-light); }
+.nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: rgba(255,255,255,0.75);
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 14px;
+  transition: var(--transition);
+}
+.nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+.nav-btn.active { background: rgba(200,146,42,0.15); color: var(--gold-light); border-color: rgba(200,146,42,0.3); }
+.nav-btn.cta { background: var(--gold); color: var(--navy); font-weight: 600; border-color: var(--gold); }
+.nav-btn.cta:hover { background: var(--gold-light); }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── HOME HERO ── */
+.hero {
+  background: var(--navy);
+  padding: 72px 32px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(200,146,42,0.07);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -40px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: rgba(200,146,42,0.05);
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(200,146,42,0.15);
+  color: var(--gold-light);
+  border: 1px solid rgba(200,146,42,0.3);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  color: var(--white);
+  font-weight: normal;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero h1 em { color: var(--gold-light); font-style: normal; }
+.hero p { color: rgba(255,255,255,0.6); font-size: 17px; max-width: 480px; margin: 0 auto 32px; }
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 32px;
+}
+.hero-stat-num { font-size: 28px; font-weight: 700; color: var(--white); }
+.hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-100);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-bar h2 { font-size: 16px; font-weight: 600; color: var(--navy); margin-right: 8px; }
+.filter-pill {
+  background: none;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  transition: var(--transition);
+}
+.filter-pill:hover { border-color: var(--gold); color: var(--gold); }
+.filter-pill.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.filter-search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.filter-search input {
+  border: 1px solid var(--gray-200);
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 13px;
+  width: 200px;
+  outline: none;
+  transition: var(--transition);
+}
+.filter-search input:focus { border-color: var(--navy-light); }
+
+/* ── PROPERTY GRID ── */
+.prop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.prop-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.prop-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.prop-img {
+  height: 180px;
+  background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.prop-img-emoji { font-size: 56px; }
+.prop-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-rent { background: var(--info-bg); color: var(--info); }
+.badge-sale { background: var(--success-bg); color: var(--success); }
+.prop-fav {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+.prop-body { padding: 18px; }
+.prop-price { font-size: 20px; font-weight: 700; color: var(--navy); }
+.prop-price span { font-size: 13px; font-weight: 400; color: var(--gray-400); }
+.prop-title { font-size: 15px; color: var(--gray-800); margin: 4px 0 2px; font-weight: 600; }
+.prop-loc { font-size: 13px; color: var(--gray-400); margin-bottom: 14px; }
+.prop-meta {
+  display: flex;
+  gap: 14px;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 12px;
+}
+.prop-meta-item { font-size: 12px; color: var(--gray-600); }
+.prop-meta-item strong { color: var(--gray-800); font-size: 13px; }
+
+/* ── CONTAINER ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.section-header h2 { font-size: 22px; font-weight: 700; color: var(--navy); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition: var(--transition);
+}
+.btn-primary { background: var(--navy); color: var(--white); }
+.btn-primary:hover { background: var(--navy-mid); }
+.btn-gold { background: var(--gold); color: var(--white); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-outline { background: none; border: 1px solid var(--gray-200); color: var(--gray-600); }
+.btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+.btn-danger { background: none; border: 1px solid var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger-bg); }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn-success { background: var(--success); color: var(--white); }
+
+/* ── CARDS / PANELS ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.card-header h3 { font-size: 16px; font-weight: 600; color: var(--navy); }
+
+/* ── FORMS ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1/-1; }
+.form-group label { font-size: 13px; font-weight: 500; color: var(--gray-600); }
+.form-group input, .form-group select, .form-group textarea {
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+  background: var(--white);
+  color: var(--gray-800);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--navy-light);
+  box-shadow: 0 0 0 3px rgba(26,95,168,0.08);
+}
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; padding: 10px 14px; background: var(--gray-50); color: var(--gray-600); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--gray-100); }
+td { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--gray-50); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-open { background: var(--warning-bg); color: var(--warning); }
+.badge-inprogress { background: var(--info-bg); color: var(--info); }
+.badge-resolved { background: var(--success-bg); color: var(--success); }
+.badge-closed { background: var(--gray-100); color: var(--gray-600); }
+.badge-high { background: var(--danger-bg); color: var(--danger); }
+.badge-medium { background: var(--warning-bg); color: var(--warning); }
+.badge-low { background: var(--info-bg); color: var(--info); }
+
+/* ── STAT CARDS ── */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: var(--white); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
+.stat-card .label { font-size: 12px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: var(--navy); }
+.stat-card .delta { font-size: 12px; color: var(--success); margin-top: 4px; }
+.stat-icon { float: right; font-size: 24px; margin-top: -4px; }
+
+/* ── LOGIN ── */
+.login-wrap {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  padding: 32px;
+}
+.login-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+.login-card h2 { font-size: 24px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.login-card p { color: var(--gray-400); font-size: 14px; margin-bottom: 28px; }
+.login-logo { font-family: var(--font-serif); font-size: 18px; color: var(--navy); margin-bottom: 24px; }
+.login-logo span { color: var(--gold); }
+.login-hint { background: var(--gold-pale); border: 1px solid rgba(200,146,42,0.2); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--warning); margin-bottom: 20px; }
+
+/* ── TICKET DETAIL ── */
+.ticket-thread { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+.ticket-msg {
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 80%;
+}
+.ticket-msg.tenant { background: var(--info-bg); color: var(--gray-800); align-self: flex-start; }
+.ticket-msg.admin { background: var(--navy); color: var(--white); align-self: flex-end; }
+.ticket-msg .msg-meta { font-size: 11px; opacity: 0.6; margin-bottom: 5px; }
+.ticket-reply { display: flex; gap: 10px; margin-top: 16px; }
+.ticket-reply textarea {
+  flex: 1;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  height: 72px;
+}
+.ticket-reply textarea:focus { border-color: var(--navy-light); }
+
+/* ── PROPERTY DETAIL ── */
+.prop-detail-img {
+  height: 260px;
+  background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  margin-bottom: 24px;
+}
+.prop-detail-info { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+.prop-specs { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0; }
+.spec-item { background: var(--gray-50); border-radius: 8px; padding: 12px 14px; }
+.spec-item .spec-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+.spec-item .spec-val { font-size: 16px; font-weight: 600; color: var(--navy); margin-top: 3px; }
+
+/* ── SIDEBAR ── */
+.admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+.sidebar {
+  background: var(--navy);
+  padding: 24px 0;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+.sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sidebar-logo p { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.sidebar-section { padding: 6px 12px 2px; font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 3px solid transparent;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.sidebar-item.active { background: rgba(200,146,42,0.12); color: var(--gold-light); border-left-color: var(--gold); }
+.sidebar-item .icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-badge {
+  margin-left: auto;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.main-content { padding: 28px 32px; background: var(--cream); overflow-y: auto; }
+
+/* ── TENANT LAYOUT ── */
+.tenant-layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 60px); }
+.tenant-sidebar { background: var(--navy-mid); padding: 24px 0; position: sticky; top: 60px; height: calc(100vh - 60px); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 48px; color: var(--gray-400); }
+.empty .icon { font-size: 40px; margin-bottom: 12px; }
+.empty p { font-size: 15px; }
+
+/* ── MODAL OVERLAY ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,27,51,0.55);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(12,27,51,0.25);
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 { font-size: 18px; font-weight: 600; color: var(--navy); }
+.modal-close { background: none; border: none; font-size: 20px; color: var(--gray-400); cursor: pointer; line-height: 1; padding: 4px; }
+.modal-body { padding: 20px 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-100); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy);
+  color: var(--white);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 300;
+  display: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.toast.success { background: var(--success); }
+.toast.show { display: block; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── SEARCH RESULTS ── */
+.no-results { text-align: center; padding: 48px; color: var(--gray-400); font-size: 15px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 32px; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .admin-layout, .tenant-layout { grid-template-columns: 1fr; }
+  .sidebar, .tenant-sidebar { display: none; }
+  .prop-detail-info { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Prop<span>Estate</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Browse</button>
+    <button class="nav-btn" onclick="showPage('tenant-login')" id="nav-tenant-btn">Tenant Portal</button>
+    <button class="nav-btn cta" onclick="showPage('admin-login')" id="nav-admin-btn">Admin</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: HOME
+══════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">Find Your Perfect Space</div>
+    <h1>Modern Living, <em>Simplified</em></h1>
+    <p>Discover curated rental and sale properties managed with transparency and care.</p>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num" id="stat-total">0</div><div class="hero-stat-label">Properties Listed</div></div>
+      <div><div class="hero-stat-num" id="stat-rent">0</div><div class="hero-stat-label">Available to Rent</div></div>
+      <div><div class="hero-stat-num" id="stat-sale">0</div><div class="hero-stat-label">Available for Sale</div></div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <h2>Properties</h2>
+    <button class="filter-pill active" onclick="filterProps('all',this)">All</button>
+    <button class="filter-pill" onclick="filterProps('rent',this)">For Rent</button>
+    <button class="filter-pill" onclick="filterProps('sale',this)">For Sale</button>
+    <div class="filter-search">
+      <input type="text" id="search-input" placeholder="Search city, area..." oninput="searchProps()">
+    </div>
+  </div>
+  <div class="prop-grid" id="prop-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: PROPERTY DETAIL
+══════════════════════════════════════════ -->
+<div class="page" id="page-prop-detail">
+  <div class="container">
+    <button class="btn btn-outline btn-sm" style="margin-bottom:20px;" onclick="goBack()">&#8592; Back</button>
+    <div id="prop-detail-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: TENANT LOGIN
+══════════════════════════════════════════ -->
+<div class="page" id="page-tenant-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">Prop<span>Estate</span> Tenant</div>
+      <h2>Tenant Portal</h2>
+      <p>Access your property and manage support requests</p>
+      <div class="login-hint">Demo: select any tenant from the list below</div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Select Tenant Account</label>
+        <select id="tenant-select"></select>
+      </div>
+      <div class="form-group" style="margin-bottom:24px;">
+        <label>Password</label>
+        <input type="password" value="tenant123" placeholder="tenant123">
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="tenantLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: ADMIN LOGIN
+══════════════════════════════════════════ -->
+<div class="page" id="page-admin-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">Prop<span>Estate</span> Admin</div>
+      <h2>Admin Dashboard</h2>
+      <p>Manage properties and resolve tenant issues</p>
+      <div class="login-hint">Demo password: <strong>admin123</strong></div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Username</label>
+        <input type="text" id="admin-user" value="admin" placeholder="admin">
+      </div>
+      <div class="form-group" style="margin-bottom:24px;">
+        <label>Password</label>
+        <input type="password" id="admin-pass" value="admin123" placeholder="admin123">
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="adminLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: ADMIN DASHBOARD
+══════════════════════════════════════════ -->
+<div class="page" id="page-admin">
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="nav-logo" style="font-size:16px;">Prop<span style="color:var(--gold-light)">Estate</span></div>
+        <p>Admin Panel</p>
+      </div>
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-item active" onclick="adminSection('dashboard',this)"><span class="icon">📊</span> Dashboard</div>
+      <div class="sidebar-section">Properties</div>
+      <div class="sidebar-item" onclick="adminSection('properties',this)"><span class="icon">🏠</span> All Properties</div>
+      <div class="sidebar-item" onclick="adminSection('add-property',this)"><span class="icon">➕</span> Add Property</div>
+      <div class="sidebar-section">Support</div>
+      <div class="sidebar-item" onclick="adminSection('tickets',this)"><span class="icon">🎫</span> Tickets <span class="sidebar-badge" id="admin-ticket-badge">0</span></div>
+      <div class="sidebar-section">System</div>
+      <div class="sidebar-item" onclick="adminSection('tenants',this)"><span class="icon">👥</span> Tenants</div>
+      <div class="sidebar-item" onclick="adminLogout()"><span class="icon">🚪</span> Logout</div>
+    </aside>
+    <main class="main-content" id="admin-main"></main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: TENANT DASHBOARD
+══════════════════════════════════════════ -->
+<div class="page" id="page-tenant">
+  <div class="tenant-layout">
+    <aside class="tenant-sidebar">
+      <div class="sidebar-logo">
+        <div class="nav-logo" style="font-size:16px;">Prop<span style="color:var(--gold-light)">Estate</span></div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;" id="tenant-name-sidebar">Tenant</p>
+      </div>
+      <div class="sidebar-section">My Account</div>
+      <div class="sidebar-item active" onclick="tenantSection('my-property',this)"><span class="icon">🏠</span> My Property</div>
+      <div class="sidebar-item" onclick="tenantSection('my-tickets',this)"><span class="icon">🎫</span> My Tickets</div>
+      <div class="sidebar-item" onclick="tenantSection('raise-ticket',this)"><span class="icon">📝</span> Raise Ticket</div>
+      <div class="sidebar-section">Account</div>
+      <div class="sidebar-item" onclick="tenantLogout()"><span class="icon">🚪</span> Logout</div>
+    </aside>
+    <main class="main-content" id="tenant-main"></main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+<!-- Edit Property Modal -->
+<div class="overlay" id="overlay-edit-prop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Property</h3>
+      <button class="modal-close" onclick="closeModal('overlay-edit-prop')">✕</button>
+    </div>
+    <div class="modal-body" id="edit-prop-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('overlay-edit-prop')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditProperty()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Enquiry Modal -->
+<div class="overlay" id="overlay-enquiry">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="enquiry-modal-title">Make an Enquiry</h3>
+      <button class="modal-close" onclick="closeModal('overlay-enquiry')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--gray-400);margin-bottom:20px;" id="enquiry-prop-name"></p>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="enq-name" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" id="enq-email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" id="enq-phone" placeholder="+44 7700 000000"></div>
+        <div class="form-group"><label>Preferred Viewing Date</label><input type="date" id="enq-date"></div>
+        <div class="form-group full"><label>Message</label><textarea id="enq-message" placeholder="Any specific questions or requirements..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('overlay-enquiry')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitEnquiry()">📩 Send Enquiry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Pack Modal -->
+<div class="overlay" id="overlay-infopack">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>Request Info Pack</h3>
+      <button class="modal-close" onclick="closeModal('overlay-infopack')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--gray-400);margin-bottom:20px;" id="infopack-prop-name"></p>
+      <div style="background:var(--gold-pale);border:1px solid rgba(200,146,42,0.2);border-radius:10px;padding:16px;margin-bottom:20px;font-size:13px;color:var(--warning);">
+        📄 The information pack includes: floor plans, EPC rating, lease terms, and full property brochure.
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="ip-name" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" id="ip-email" placeholder="your@email.com"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('overlay-infopack')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitInfoPack()">📋 Request Pack</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ticket Detail Modal (Admin) -->
+<div class="overlay" id="overlay-ticket-detail">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h3 id="modal-ticket-title">Ticket</h3>
+      <button class="modal-close" onclick="closeModal('overlay-ticket-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-ticket-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('overlay-ticket-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   DATA STORE
+═══════════════════════════════ */
+let state = {
+  currentUser: null,
+  userType: null,
+  prevPage: 'home',
+  currentFilter: 'all',
+  editingPropId: null,
+  currentAdminSection: 'dashboard',
+  currentTenantSection: 'my-property'
+};
+
+let properties = [
+  { id:1, title:'Lakeside View Apartment', type:'rent', price:1850, period:'/mo', city:'London', area:'Canary Wharf', beds:2, baths:1, size:780, emoji:'🏙️', desc:'Modern apartment with stunning river views, floor-to-ceiling windows, and access to premium amenities including gym and concierge.', available:true },
+  { id:2, title:'Georgian Townhouse', type:'sale', price:625000, period:'', city:'London', area:'Notting Hill', beds:4, baths:3, size:2100, emoji:'🏡', desc:'Beautifully restored Victorian townhouse with original period features, private garden, and off-street parking in one of London\'s most desirable neighbourhoods.', available:true },
+  { id:3, title:'Studio Flat — City Centre', type:'rent', price:1100, period:'/mo', city:'Manchester', area:'Northern Quarter', beds:1, baths:1, size:420, emoji:'🌆', desc:'Contemporary studio with open-plan layout, high-speed broadband, and walking distance to transport links and restaurants.', available:true },
+  { id:4, title:'Countryside Cottage', type:'sale', price:385000, period:'', city:'Oxfordshire', area:'Woodstock', beds:3, baths:2, size:1350, emoji:'🌿', desc:'Charming stone cottage with exposed beams, inglenook fireplace, and mature gardens. Perfect rural retreat.', available:true },
+  { id:5, title:'Penthouse Suite', type:'rent', price:4500, period:'/mo', city:'London', area:'Mayfair', beds:3, baths:2, size:1600, emoji:'🏛️', desc:'Luxury penthouse with private terrace, panoramic views, valet parking, and concierge services in a Grade II listed building.', available:true },
+  { id:6, title:'New Build Semi-Detached', type:'sale', price:310000, period:'', city:'Birmingham', area:'Edgbaston', beds:3, baths:2, size:1100, emoji:'🏘️', desc:'Energy-efficient new build with modern kitchen, landscaped garden, EV charging point, and Help to Buy eligible.', available:true },
+];
+
+let tenants = [
+  { id:1, name:'Sarah Mitchell', email:'sarah@tenant.com', propertyId:1, phone:'07700 900001' },
+  { id:2, name:'James Okonkwo', email:'james@tenant.com', propertyId:3, phone:'07700 900002' },
+  { id:3, name:'Emily Chen', email:'emily@tenant.com', propertyId:5, phone:'07700 900003' },
+];
+
+let tickets = [
+  { id:1, tenantId:1, propertyId:1, subject:'Boiler not heating properly', category:'Maintenance', priority:'high', status:'inprogress', created:'2025-04-10', messages:[
+    { from:'tenant', text:'The boiler has been making a loud banging noise and the flat isn\'t heating properly since last Thursday.', time:'10:30 AM, Apr 10' },
+    { from:'admin', text:'Thank you for reporting this. We\'ve scheduled a heating engineer for Tuesday 15th April between 10am–12pm. Please ensure someone is available.', time:'2:15 PM, Apr 10' },
+  ]},
+  { id:2, tenantId:2, propertyId:3, subject:'Broken window latch in bedroom', category:'Maintenance', priority:'medium', status:'open', created:'2025-04-14', messages:[
+    { from:'tenant', text:'The window latch in the master bedroom is broken and won\'t lock properly. This is a security concern.', time:'9:00 AM, Apr 14' },
+  ]},
+  { id:3, tenantId:3, propertyId:5, subject:'Query about parking allocation', category:'General', priority:'low', status:'resolved', created:'2025-04-05', messages:[
+    { from:'tenant', text:'Could you confirm which parking space is allocated to my unit? I\'ve been using space 12 but someone left a note.', time:'11:00 AM, Apr 5' },
+    { from:'admin', text:'Your allocated space is number 14, adjacent to the lift. We\'ve updated the parking register. Apologies for the confusion.', time:'3:30 PM, Apr 5' },
+    { from:'admin', text:'Ticket resolved. Please let us know if you need anything else.', time:'3:31 PM, Apr 5' },
+  ]},
+];
+
+let nextPropId = 7;
+let nextTicketId = 4;
+
+/* ═══════════════════════════════
+   NAVIGATION
+═══════════════════════════════ */
+function showPage(name, prev) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (prev) state.prevPage = prev;
+  window.scrollTo(0, 0);
+  // Update nav active states
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+function goBack() { showPage(state.prevPage); }
+
+/* ═══════════════════════════════
+   HOME
+═══════════════════════════════ */
+function renderHome() {
+  const total = properties.length;
+  const rents = properties.filter(p => p.type === 'rent').length;
+  const sales = properties.filter(p => p.type === 'sale').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-rent').textContent = rents;
+  document.getElementById('stat-sale').textContent = sales;
+  renderPropGrid(properties);
+}
+
+function renderPropGrid(list) {
+  const grid = document.getElementById('prop-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="no-results">No properties match your search.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="prop-card" onclick="showPropDetail(${p.id})">
+      <div class="prop-img">
+        <span class="prop-img-emoji">${p.emoji}</span>
+        <span class="prop-badge ${p.type === 'rent' ? 'badge-rent' : 'badge-sale'}">${p.type === 'rent' ? 'For Rent' : 'For Sale'}</span>
+        <div class="prop-fav">♡</div>
+      </div>
+      <div class="prop-body">
+        <div class="prop-price">${formatPrice(p)} <span>${p.period}</span></div>
+        <div class="prop-title">${p.title}</div>
+        <div class="prop-loc">📍 ${p.area}, ${p.city}</div>
+        <div class="prop-meta">
+          <div class="prop-meta-item"><strong>${p.beds}</strong><br>Beds</div>
+          <div class="prop-meta-item"><strong>${p.baths}</strong><br>Baths</div>
+          <div class="prop-meta-item"><strong>${p.size}</strong><br>sq ft</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProps(type, btn) {
+  state.currentFilter = type;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function searchProps() { applyFilters(); }
+
+function applyFilters() {
+  let list = [...properties];
+  if (state.currentFilter !== 'all') list = list.filter(p => p.type === state.currentFilter);
+  const q = document.getElementById('search-input').value.toLowerCase();
+  if (q) list = list.filter(p => p.title.toLowerCase().includes(q) || p.city.toLowerCase().includes(q) || p.area.toLowerCase().includes(q));
+  renderPropGrid(list);
+}
+
+function showPropDetail(id) {
+  const p = properties.find(x => x.id === id);
+  if (!p) return;
+  const content = document.getElementById('prop-detail-content');
+  content.innerHTML = `
+    <div class="prop-detail-img">${p.emoji}</div>
+    <div class="prop-detail-info">
+      <div>
+        <span class="badge ${p.type === 'rent' ? 'badge-rent' : 'badge-sale'}" style="margin-bottom:10px;">${p.type === 'rent' ? 'For Rent' : 'For Sale'}</span>
+        <h1 style="font-family:var(--font-serif);font-size:32px;color:var(--navy);font-weight:normal;margin:8px 0 4px;">${p.title}</h1>
+        <p style="color:var(--gray-400);font-size:15px;margin-bottom:16px;">📍 ${p.area}, ${p.city}</p>
+        <p style="font-size:15px;color:var(--gray-600);line-height:1.7;">${p.desc}</p>
+        <div class="prop-specs">
+          <div class="spec-item"><div class="spec-label">Bedrooms</div><div class="spec-val">${p.beds}</div></div>
+          <div class="spec-item"><div class="spec-label">Bathrooms</div><div class="spec-val">${p.baths}</div></div>
+          <div class="spec-item"><div class="spec-label">Floor Area</div><div class="spec-val">${p.size} ft²</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div style="font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px;">${formatPrice(p)}<span style="font-size:14px;color:var(--gray-400);font-weight:400;">${p.period}</span></div>
+          <p style="font-size:13px;color:var(--gray-400);margin-bottom:20px;">${p.type === 'rent' ? 'Monthly rent, bills excluded' : 'Asking price'}</p>
+          <button class="btn btn-gold" style="width:100%;margin-bottom:10px;" onclick="openEnquiryModal(${p.id})">${p.type === 'rent' ? '📩 Book Viewing' : '📩 Make Enquiry'}</button>
+          <button class="btn btn-outline" style="width:100%;" onclick="openInfoPackModal(${p.id})">📋 Request Info Pack</button>
+        </div>
+      </div>
+    </div>
+  `;
+  showPage('prop-detail', 'home');
+}
+
+function formatPrice(p) {
+  return '£' + p.price.toLocaleString();
+}
+
+/* ═══════════════════════════════
+   ADMIN AUTH
+═══════════════════════════════ */
+function adminLogin() {
+  const user = document.getElementById('admin-user').value;
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === 'admin123') {
+    state.currentUser = { name: 'Administrator' };
+    state.userType = 'admin';
+    showPage('admin');
+    renderAdminDashboard();
+    updateAdminBadge();
+  } else {
+    showToast('Incorrect password. Try: admin123', 'danger');
+  }
+}
+
+function adminLogout() {
+  state.currentUser = null;
+  state.userType = null;
+  showPage('home');
+  showToast('Logged out successfully');
+}
+
+/* ═══════════════════════════════
+   ADMIN SECTIONS
+═══════════════════════════════ */
+function adminSection(name, el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  state.currentAdminSection = name;
+  const main = document.getElementById('admin-main');
+  if (name === 'dashboard') renderAdminDashboard();
+  else if (name === 'properties') renderAdminProperties();
+  else if (name === 'add-property') renderAddProperty();
+  else if (name === 'tickets') renderAdminTickets();
+  else if (name === 'tenants') renderAdminTenants();
+}
+
+function updateAdminBadge() {
+  const open = tickets.filter(t => t.status === 'open' || t.status === 'inprogress').length;
+  document.getElementById('admin-ticket-badge').textContent = open;
+}
+
+function renderAdminDashboard() {
+  const openTix = tickets.filter(t => t.status === 'open').length;
+  const inProg = tickets.filter(t => t.status === 'inprogress').length;
+  const resolved = tickets.filter(t => t.status === 'resolved').length;
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header">
+      <h2>Dashboard</h2>
+      <span style="font-size:13px;color:var(--gray-400);">Welcome back, Administrator</span>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="label">Total Properties</div><div class="value">${properties.length}<span class="stat-icon">🏠</span></div></div>
+      <div class="stat-card"><div class="label">Active Tenants</div><div class="value">${tenants.length}<span class="stat-icon">👥</span></div></div>
+      <div class="stat-card"><div class="label">Open Tickets</div><div class="value" style="color:var(--danger)">${openTix}<span class="stat-icon">🔴</span></div></div>
+      <div class="stat-card"><div class="label">Resolved Tickets</div><div class="value" style="color:var(--success)">${resolved}<span class="stat-icon">✅</span></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div class="card">
+        <div class="card-header"><h3>Recent Tickets</h3><button class="btn btn-outline btn-sm" onclick="adminSection('tickets', document.querySelectorAll('.sidebar-item')[4])">View All</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Subject</th><th>Tenant</th><th>Priority</th><th>Status</th></tr></thead>
+            <tbody>${tickets.slice(0,3).map(t => {
+              const tenant = tenants.find(x => x.id === t.tenantId);
+              return `<tr style="cursor:pointer;" onclick="openTicketModal(${t.id})">
+                <td style="font-weight:500;">${t.subject}</td>
+                <td style="color:var(--gray-600);">${tenant ? tenant.name : '-'}</td>
+                <td><span class="badge badge-${t.priority}">${t.priority}</span></td>
+                <td><span class="badge badge-${t.status}">${t.status}</span></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Properties Overview</h3></div>
+        ${properties.slice(0,4).map(p => `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);">
+            <span style="font-size:24px;">${p.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:500;">${p.title}</div>
+              <div style="font-size:12px;color:var(--gray-400);">${p.area}, ${p.city}</div>
+            </div>
+            <span class="badge ${p.type === 'rent' ? 'badge-rent' : 'badge-sale'}">${p.type}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminProperties() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header">
+      <h2>All Properties (${properties.length})</h2>
+      <button class="btn btn-primary" onclick="adminSection('add-property', document.querySelectorAll('.sidebar-item')[3])">+ Add Property</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Property</th><th>Type</th><th>Location</th><th>Price</th><th>Beds/Baths</th><th>Actions</th></tr></thead>
+          <tbody id="prop-table-body">${renderPropTableRows()}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderPropTableRows() {
+  return properties.map(p => `
+    <tr>
+      <td><span style="font-size:20px;margin-right:8px;">${p.emoji}</span><strong>${p.title}</strong></td>
+      <td><span class="badge ${p.type === 'rent' ? 'badge-rent' : 'badge-sale'}">${p.type}</span></td>
+      <td style="color:var(--gray-600);">${p.area}, ${p.city}</td>
+      <td style="font-weight:600;">£${p.price.toLocaleString()}${p.period}</td>
+      <td style="color:var(--gray-600);">${p.beds} bed · ${p.baths} bath</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openEditModal(${p.id})" style="margin-right:6px;">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProperty(${p.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderAddProperty() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header"><h2>Add New Property</h2></div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-group full"><label>Property Title *</label><input type="text" id="ap-title" placeholder="e.g. Modern 2-bed apartment"></div>
+        <div class="form-group"><label>Listing Type *</label><select id="ap-type"><option value="rent">For Rent</option><option value="sale">For Sale</option></select></div>
+        <div class="form-group"><label>Price (£) *</label><input type="number" id="ap-price" placeholder="e.g. 1500"></div>
+        <div class="form-group"><label>City *</label><input type="text" id="ap-city" placeholder="e.g. London"></div>
+        <div class="form-group"><label>Area / Neighbourhood *</label><input type="text" id="ap-area" placeholder="e.g. Canary Wharf"></div>
+        <div class="form-group"><label>Bedrooms</label><input type="number" id="ap-beds" value="1" min="0"></div>
+        <div class="form-group"><label>Bathrooms</label><input type="number" id="ap-baths" value="1" min="0"></div>
+        <div class="form-group"><label>Floor Area (sq ft)</label><input type="number" id="ap-size" placeholder="e.g. 800"></div>
+        <div class="form-group"><label>Property Icon</label>
+          <select id="ap-emoji">
+            <option value="🏠">🏠 House</option>
+            <option value="🏙️">🏙️ Apartment</option>
+            <option value="🏡">🏡 Townhouse</option>
+            <option value="🌆">🌆 Studio</option>
+            <option value="🏛️">🏛️ Penthouse</option>
+            <option value="🏘️">🏘️ Semi-detached</option>
+            <option value="🌿">🌿 Cottage</option>
+            <option value="🏗️">🏗️ New Build</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Description *</label><textarea id="ap-desc" placeholder="Describe the property..."></textarea></div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="adminSection('properties', document.querySelectorAll('.sidebar-item')[2])">Cancel</button>
+        <button class="btn btn-primary" onclick="addProperty()">Add Property</button>
+      </div>
+    </div>
+  `;
+}
+
+function addProperty() {
+  const title = document.getElementById('ap-title').value.trim();
+  const type  = document.getElementById('ap-type').value;
+  const price = parseInt(document.getElementById('ap-price').value);
+  const city  = document.getElementById('ap-city').value.trim();
+  const area  = document.getElementById('ap-area').value.trim();
+  const beds  = parseInt(document.getElementById('ap-beds').value) || 1;
+  const baths = parseInt(document.getElementById('ap-baths').value) || 1;
+  const size  = parseInt(document.getElementById('ap-size').value) || 0;
+  const emoji = document.getElementById('ap-emoji').value;
+  const desc  = document.getElementById('ap-desc').value.trim();
+  if (!title || !price || !city || !area || !desc) { showToast('Please fill in all required fields', 'danger'); return; }
+  properties.push({ id: nextPropId++, title, type, price, period: type === 'rent' ? '/mo' : '', city, area, beds, baths, size, emoji, desc, available: true });
+  renderHome();
+  showToast('Property added successfully!', 'success');
+  adminSection('properties', document.querySelectorAll('.sidebar-item')[2]);
+}
+
+function openEditModal(id) {
+  state.editingPropId = id;
+  const p = properties.find(x => x.id === id);
+  document.getElementById('edit-prop-body').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group full"><label>Property Title</label><input type="text" id="ep-title" value="${p.title}"></div>
+      <div class="form-group"><label>Type</label><select id="ep-type"><option value="rent" ${p.type==='rent'?'selected':''}>For Rent</option><option value="sale" ${p.type==='sale'?'selected':''}>For Sale</option></select></div>
+      <div class="form-group"><label>Price (£)</label><input type="number" id="ep-price" value="${p.price}"></div>
+      <div class="form-group"><label>City</label><input type="text" id="ep-city" value="${p.city}"></div>
+      <div class="form-group"><label>Area</label><input type="text" id="ep-area" value="${p.area}"></div>
+      <div class="form-group"><label>Beds</label><input type="number" id="ep-beds" value="${p.beds}"></div>
+      <div class="form-group"><label>Baths</label><input type="number" id="ep-baths" value="${p.baths}"></div>
+      <div class="form-group"><label>Size (sq ft)</label><input type="number" id="ep-size" value="${p.size}"></div>
+      <div class="form-group full"><label>Description</label><textarea id="ep-desc">${p.desc}</textarea></div>
+    </div>
+  `;
+  document.getElementById('overlay-edit-prop').classList.add('open');
+}
+
+function saveEditProperty() {
+  const p = properties.find(x => x.id === state.editingPropId);
+  p.title = document.getElementById('ep-title').value.trim();
+  p.type  = document.getElementById('ep-type').value;
+  p.price = parseInt(document.getElementById('ep-price').value);
+  p.city  = document.getElementById('ep-city').value.trim();
+  p.area  = document.getElementById('ep-area').value.trim();
+  p.beds  = parseInt(document.getElementById('ep-beds').value);
+  p.baths = parseInt(document.getElementById('ep-baths').value);
+  p.size  = parseInt(document.getElementById('ep-size').value);
+  p.desc  = document.getElementById('ep-desc').value.trim();
+  p.period = p.type === 'rent' ? '/mo' : '';
+  closeModal('overlay-edit-prop');
+  renderHome();
+  renderAdminProperties();
+  showToast('Property updated successfully!', 'success');
+}
+
+function deleteProperty(id) {
+  if (!confirm('Delete this property? This cannot be undone.')) return;
+  properties = properties.filter(p => p.id !== id);
+  renderHome();
+  renderAdminProperties();
+  showToast('Property deleted.');
+}
+
+function renderAdminTickets() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header"><h2>Support Tickets</h2></div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      ${['all','open','inprogress','resolved','closed'].map(s => `<button class="filter-pill ${s==='all'?'active':''}" onclick="filterTickets('${s}',this)">${s==='inprogress'?'In Progress':s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Subject</th><th>Tenant</th><th>Property</th><th>Priority</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
+          <tbody id="tickets-table">${renderTicketRows(tickets)}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function filterTickets(status, btn) {
+  document.querySelectorAll('#admin-main .filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const list = status === 'all' ? tickets : tickets.filter(t => t.status === status);
+  document.getElementById('tickets-table').innerHTML = renderTicketRows(list);
+}
+
+function renderTicketRows(list) {
+  if (!list.length) return '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:32px;">No tickets found</td></tr>';
+  return list.map(t => {
+    const tenant = tenants.find(x => x.id === t.tenantId);
+    const prop = properties.find(x => x.id === t.propertyId);
+    return `<tr>
+      <td style="font-size:12px;color:var(--gray-400);">#${t.id}</td>
+      <td><strong style="font-size:14px;">${t.subject}</strong><br><span style="font-size:12px;color:var(--gray-400);">${t.category}</span></td>
+      <td style="font-size:13px;">${tenant ? tenant.name : '-'}</td>
+      <td style="font-size:12px;color:var(--gray-400);">${prop ? prop.title : '-'}</td>
+      <td><span class="badge badge-${t.priority}">${t.priority}</span></td>
+      <td><span class="badge badge-${t.status}">${t.status === 'inprogress' ? 'In Progress' : t.status}</span></td>
+      <td style="font-size:12px;color:var(--gray-400);">${t.created}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openTicketModal(${t.id})">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openTicketModal(id) {
+  const t = tickets.find(x => x.id === id);
+  const tenant = tenants.find(x => x.id === t.tenantId);
+  const prop = properties.find(x => x.id === t.propertyId);
+  document.getElementById('modal-ticket-title').textContent = `Ticket #${t.id}: ${t.subject}`;
+  document.getElementById('modal-ticket-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:var(--gray-50);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;">Status</div>
+        <select id="ticket-status-${t.id}" style="border:1px solid var(--gray-200);border-radius:6px;padding:5px 8px;font-size:13px;margin-top:4px;background:var(--white);">
+          ${['open','inprogress','resolved','closed'].map(s => `<option value="${s}" ${t.status===s?'selected':''}>${s==='inprogress'?'In Progress':s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="background:var(--gray-50);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;">Tenant</div><div style="font-size:14px;font-weight:500;margin-top:4px;">${tenant ? tenant.name : '-'}</div></div>
+      <div style="background:var(--gray-50);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;">Property</div><div style="font-size:13px;margin-top:4px;">${prop ? prop.title : '-'}</div></div>
+    </div>
+    <div class="ticket-thread" id="thread-${t.id}">
+      ${t.messages.map(m => `
+        <div class="ticket-msg ${m.from}">
+          <div class="msg-meta">${m.from === 'admin' ? '🔑 Admin' : '👤 Tenant'} · ${m.time}</div>
+          ${m.text}
+        </div>
+      `).join('')}
+    </div>
+    <div class="ticket-reply" style="margin-top:16px;">
+      <textarea id="reply-text-${t.id}" placeholder="Type your reply..."></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" onclick="adminReply(${t.id})">Send Reply</button>
+        <button class="btn btn-success btn-sm" onclick="updateTicketStatus(${t.id})">Update Status</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('overlay-ticket-detail').classList.add('open');
+}
+
+function adminReply(tid) {
+  const replyEl = document.getElementById(`reply-text-${tid}`);
+  const text = replyEl.value.trim();
+  if (!text) return;
+  const t = tickets.find(x => x.id === tid);
+  const now = new Date();
+  t.messages.push({ from:'admin', text, time: now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) + ', ' + now.toLocaleDateString('en-GB', {day:'numeric',month:'short'}) });
+  if (t.status === 'open') t.status = 'inprogress';
+  replyEl.value = '';
+  const thread = document.getElementById(`thread-${tid}`);
+  thread.innerHTML = t.messages.map(m => `
+    <div class="ticket-msg ${m.from}">
+      <div class="msg-meta">${m.from === 'admin' ? '🔑 Admin' : '👤 Tenant'} · ${m.time}</div>
+      ${m.text}
+    </div>
+  `).join('');
+  thread.scrollTop = thread.scrollHeight;
+  updateAdminBadge();
+  showToast('Reply sent!', 'success');
+}
+
+function updateTicketStatus(tid) {
+  const t = tickets.find(x => x.id === tid);
+  t.status = document.getElementById(`ticket-status-${tid}`).value;
+  updateAdminBadge();
+  if (state.currentAdminSection === 'tickets') renderAdminTickets();
+  showToast('Status updated to: ' + t.status, 'success');
+}
+
+function renderAdminTenants() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="section-header"><h2>Tenants (${tenants.length})</h2></div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Assigned Property</th><th>Tickets</th></tr></thead>
+          <tbody>${tenants.map(t => {
+            const prop = properties.find(x => x.id === t.propertyId);
+            const tix = tickets.filter(x => x.tenantId === t.id).length;
+            return `<tr>
+              <td><strong>${t.name}</strong></td>
+              <td style="color:var(--gray-600);">${t.email}</td>
+              <td style="color:var(--gray-600);">${t.phone}</td>
+              <td>${prop ? `${prop.emoji} ${prop.title}` : '<span style="color:var(--gray-400)">Unassigned</span>'}</td>
+              <td><span class="badge badge-inprogress">${tix} ticket${tix !== 1 ? 's' : ''}</span></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════
+   TENANT AUTH
+═══════════════════════════════ */
+function populateTenantSelect() {
+  const sel = document.getElementById('tenant-select');
+  sel.innerHTML = tenants.map(t => `<option value="${t.id}">${t.name} — ${t.email}</option>`).join('');
+}
+
+function tenantLogin() {
+  const id = parseInt(document.getElementById('tenant-select').value);
+  const tenant = tenants.find(t => t.id === id);
+  if (tenant) {
+    state.currentUser = tenant;
+    state.userType = 'tenant';
+    document.getElementById('tenant-name-sidebar').textContent = tenant.name;
+    showPage('tenant');
+    tenantSection('my-property', document.querySelector('.tenant-sidebar .sidebar-item'));
+  }
+}
+
+function tenantLogout() {
+  state.currentUser = null;
+  state.userType = null;
+  showPage('home');
+  showToast('Logged out');
+}
+
+/* ═══════════════════════════════
+   TENANT SECTIONS
+═══════════════════════════════ */
+function tenantSection(name, el) {
+  document.querySelectorAll('.tenant-sidebar .sidebar-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  state.currentTenantSection = name;
+  if (name === 'my-property') renderTenantProperty();
+  else if (name === 'my-tickets') renderTenantTickets();
+  else if (name === 'raise-ticket') renderRaiseTicket();
+}
+
+function renderTenantProperty() {
+  const tenant = state.currentUser;
+  const prop = properties.find(x => x.id === tenant.propertyId);
+  if (!prop) {
+    document.getElementById('tenant-main').innerHTML = '<div class="empty"><div class="icon">🏠</div><p>No property assigned yet. Please contact admin.</p></div>';
+    return;
+  }
+  document.getElementById('tenant-main').innerHTML = `
+    <div class="section-header"><h2>My Property</h2><span class="badge badge-rent" style="font-size:12px;">Active Tenant</span></div>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start;">
+        <div style="width:120px;height:120px;background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:52px;">${prop.emoji}</div>
+        <div>
+          <h3 style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px;">${prop.title}</h3>
+          <p style="color:var(--gray-400);margin-bottom:12px;">📍 ${prop.area}, ${prop.city}</p>
+          <p style="font-size:14px;color:var(--gray-600);line-height:1.6;margin-bottom:16px;">${prop.desc}</p>
+          <div style="display:grid;grid-template-columns:repeat(3,auto);gap:12px;width:fit-content;">
+            <div class="spec-item"><div class="spec-label">Beds</div><div class="spec-val">${prop.beds}</div></div>
+            <div class="spec-item"><div class="spec-label">Baths</div><div class="spec-val">${prop.baths}</div></div>
+            <div class="spec-item"><div class="spec-label">Size</div><div class="spec-val">${prop.size} ft²</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;">Tenant Details</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-400);">Name</span><span style="font-weight:500;">${tenant.name}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-400);">Email</span><span style="color:var(--info)">${tenant.email}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-400);">Phone</span><span>${tenant.phone}</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;">Quick Actions</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn btn-primary" onclick="tenantSection('raise-ticket', document.querySelectorAll('.tenant-sidebar .sidebar-item')[2])">📝 Raise a Support Ticket</button>
+          <button class="btn btn-outline" onclick="tenantSection('my-tickets', document.querySelectorAll('.tenant-sidebar .sidebar-item')[1])">🎫 View My Tickets</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTenantTickets() {
+  const tid = state.currentUser.id;
+  const myTickets = tickets.filter(t => t.tenantId === tid);
+  document.getElementById('tenant-main').innerHTML = `
+    <div class="section-header">
+      <h2>My Support Tickets</h2>
+      <button class="btn btn-primary" onclick="tenantSection('raise-ticket', document.querySelectorAll('.tenant-sidebar .sidebar-item')[2])">+ New Ticket</button>
+    </div>
+    ${myTickets.length === 0 ? '<div class="empty"><div class="icon">🎫</div><p>No tickets raised yet.</p></div>' : `
+    <div style="display:flex;flex-direction:column;gap:16px;" id="tenant-ticket-list">
+      ${myTickets.map(t => `
+        <div class="card" style="cursor:pointer;" onclick="openTenantTicket(${t.id})">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--gray-400);">#${t.id}</span>
+                <span class="badge badge-${t.priority}">${t.priority}</span>
+                <span class="badge badge-${t.status}">${t.status === 'inprogress' ? 'In Progress' : t.status}</span>
+              </div>
+              <h4 style="font-size:15px;font-weight:600;color:var(--navy);">${t.subject}</h4>
+              <p style="font-size:13px;color:var(--gray-400);margin-top:4px;">${t.category} · Raised ${t.created}</p>
+            </div>
+            <div style="font-size:20px;">${t.status === 'resolved' ? '✅' : t.status === 'inprogress' ? '🔄' : '⏳'}</div>
+          </div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100);font-size:13px;color:var(--gray-600);">
+            ${t.messages.length} message${t.messages.length !== 1 ? 's' : ''} · Last: ${t.messages[t.messages.length-1].time}
+          </div>
+        </div>
+      `).join('')}
+    </div>`}
+  `;
+}
+
+function openTenantTicket(id) {
+  const t = tickets.find(x => x.id === id);
+  document.getElementById('tenant-main').innerHTML = `
+    <div style="margin-bottom:16px;"><button class="btn btn-outline btn-sm" onclick="renderTenantTickets()">&#8592; Back to tickets</button></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <div>
+          <div style="display:flex;gap:8px;margin-bottom:6px;">
+            <span style="font-size:12px;color:var(--gray-400);">#${t.id}</span>
+            <span class="badge badge-${t.priority}">${t.priority}</span>
+            <span class="badge badge-${t.status}">${t.status === 'inprogress' ? 'In Progress' : t.status}</span>
+          </div>
+          <h2 style="font-size:18px;font-weight:600;color:var(--navy);">${t.subject}</h2>
+          <p style="font-size:13px;color:var(--gray-400);">Category: ${t.category} · Created: ${t.created}</p>
+        </div>
+      </div>
+      <div class="ticket-thread" id="tenant-thread-${t.id}">
+        ${t.messages.map(m => `
+          <div class="ticket-msg ${m.from}">
+            <div class="msg-meta">${m.from === 'admin' ? '🔑 Support Team' : '👤 You'} · ${m.time}</div>
+            ${m.text}
+          </div>
+        `).join('')}
+      </div>
+      ${t.status !== 'resolved' && t.status !== 'closed' ? `
+        <div class="ticket-reply" style="margin-top:16px;">
+          <textarea id="tenant-reply-${t.id}" placeholder="Add a comment or update..."></textarea>
+          <button class="btn btn-primary" onclick="tenantReply(${t.id})">Send</button>
+        </div>
+      ` : '<div style="text-align:center;padding:16px;color:var(--success);font-size:14px;">✅ This ticket has been resolved.</div>'}
+    </div>
+  `;
+}
+
+function tenantReply(tid) {
+  const replyEl = document.getElementById(`tenant-reply-${tid}`);
+  const text = replyEl.value.trim();
+  if (!text) return;
+  const t = tickets.find(x => x.id === tid);
+  const now = new Date();
+  t.messages.push({ from:'tenant', text, time: now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) + ', ' + now.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) });
+  replyEl.value = '';
+  const thread = document.getElementById(`tenant-thread-${tid}`);
+  thread.innerHTML = t.messages.map(m => `
+    <div class="ticket-msg ${m.from}">
+      <div class="msg-meta">${m.from === 'admin' ? '🔑 Support Team' : '👤 You'} · ${m.time}</div>
+      ${m.text}
+    </div>
+  `).join('');
+  showToast('Message sent!', 'success');
+}
+
+function renderRaiseTicket() {
+  const tenant = state.currentUser;
+  const prop = properties.find(x => x.id === tenant.propertyId);
+  document.getElementById('tenant-main').innerHTML = `
+    <div class="section-header"><h2>Raise a Support Ticket</h2></div>
+    <div class="card" style="max-width:640px;">
+      <p style="font-size:14px;color:var(--gray-400);margin-bottom:20px;">Submit a maintenance request or general enquiry about your property: <strong style="color:var(--navy);">${prop ? prop.title : 'N/A'}</strong></p>
+      <div class="form-grid">
+        <div class="form-group full"><label>Subject *</label><input type="text" id="rt-subject" placeholder="Brief description of the issue"></div>
+        <div class="form-group"><label>Category</label>
+          <select id="rt-category">
+            <option>Maintenance</option>
+            <option>Plumbing</option>
+            <option>Electrical</option>
+            <option>Heating/Cooling</option>
+            <option>Security</option>
+            <option>General</option>
+            <option>Billing</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Priority</label>
+          <select id="rt-priority">
+            <option value="low">Low — General enquiry</option>
+            <option value="medium" selected>Medium — Needs attention</option>
+            <option value="high">High — Urgent issue</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Description *</label><textarea id="rt-desc" style="min-height:120px;" placeholder="Please describe the issue in detail. Include when it started and any relevant details..."></textarea></div>
+      </div>
+      <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn btn-outline" onclick="tenantSection('my-tickets', document.querySelectorAll('.tenant-sidebar .sidebar-item')[1])">Cancel</button>
+        <button class="btn btn-primary" onclick="submitTicket()">Submit Ticket</button>
+      </div>
+    </div>
+  `;
+}
+
+function submitTicket() {
+  const subject = document.getElementById('rt-subject').value.trim();
+  const category = document.getElementById('rt-category').value;
+  const priority = document.getElementById('rt-priority').value;
+  const desc = document.getElementById('rt-desc').value.trim();
+  if (!subject || !desc) { showToast('Please fill in all required fields', 'danger'); return; }
+  const tenant = state.currentUser;
+  const now = new Date();
+  const created = now.toISOString().split('T')[0];
+  const time = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) + ', ' + now.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  tickets.push({
+    id: nextTicketId++,
+    tenantId: tenant.id,
+    propertyId: tenant.propertyId,
+    subject, category, priority, status: 'open', created,
+    messages: [{ from:'tenant', text: desc, time }]
+  });
+  updateAdminBadge();
+  showToast('Ticket submitted successfully! We\'ll respond shortly.', 'success');
+  tenantSection('my-tickets', document.querySelectorAll('.tenant-sidebar .sidebar-item')[1]);
+}
+
+/* ═══════════════════════════════
+   UTILITIES
+═══════════════════════════════ */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════
+   ENQUIRY & INFO PACK
+═══════════════════════════════ */
+let _enquiryPropId = null;
+let _infoPackPropId = null;
+
+function openEnquiryModal(id) {
+  _enquiryPropId = id;
+  const p = properties.find(x => x.id === id);
+  document.getElementById('enquiry-modal-title').textContent = p.type === 'rent' ? 'Book a Viewing' : 'Make an Enquiry';
+  document.getElementById('enquiry-prop-name').textContent = '🏠 ' + p.title + ' — ' + p.area + ', ' + p.city;
+  ['enq-name','enq-email','enq-phone','enq-message'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('overlay-enquiry').classList.add('open');
+}
+
+function submitEnquiry() {
+  const name = document.getElementById('enq-name').value.trim();
+  const email = document.getElementById('enq-email').value.trim();
+  if (!name || !email) { showToast('Please enter your name and email', 'danger'); return; }
+  closeModal('overlay-enquiry');
+  showToast('Enquiry sent! We\'ll be in touch within 24 hours.', 'success');
+}
+
+function openInfoPackModal(id) {
+  _infoPackPropId = id;
+  const p = properties.find(x => x.id === id);
+  document.getElementById('infopack-prop-name').textContent = '🏠 ' + p.title + ' — ' + p.area + ', ' + p.city;
+  ['ip-name','ip-email'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('overlay-infopack').classList.add('open');
+}
+
+function submitInfoPack() {
+  const name = document.getElementById('ip-name').value.trim();
+  const email = document.getElementById('ip-email').value.trim();
+  if (!name || !email) { showToast('Please enter your name and email', 'danger'); return; }
+  closeModal('overlay-infopack');
+  showToast('Info pack will be emailed to ' + email + ' shortly!', 'success');
+}
+
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+renderHome();
+populateTenantSelect();
+</script>
+</body>
+</html>
